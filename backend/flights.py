@@ -27,7 +27,6 @@ def match(origin, destination, date):
 	search = url + origin + "&destination=" + destination +"&departure_date=" + date + "&travel_class=ECONOMY" + "&non-stop=true&max_price=10000"
 	page = requests.get(search)
 	parsed = json.loads(page.text)
-	total = parsed["results"]
 	tol_counter = 0
 	itin_counter = 0
 	flig_counter = 0
@@ -38,25 +37,14 @@ def match(origin, destination, date):
 	#some iteration must be going wrong
 
 	result = ""
-	try:
-		while total[tol_counter]:
-			try:
-				while total[tol_counter]["itineraries"][itin_counter]:
-					try:
-						while total[tol_counter]["itineraries"][itin_counter]["outbound"]["flights"][flig_counter]:
-							company = total[tol_counter]["itineraries"][itin_counter]["outbound"]["flights"][flig_counter]["operating_airline"]
-							number = total[tol_counter]["itineraries"][itin_counter]["outbound"]["flights"][flig_counter]["flight_number"]
-							itin_counter += 1
-							result += company + number
-					except IndexError:
-						break
-					flig_counter += 1
-			except IndexError:
-				break
-			tol_counter += 1
-	except IndexError:
-		pass
-	return result
+	#print parsed["results"][0]["itineraries"][0]["outbound"]["flights"]
+	if len(parsed["results"][0]["itineraries"][0]["outbound"]["flights"]) == 1:
+		company = parsed["results"][0]["itineraries"][0]["outbound"]["flights"]["operating_airline"]
+		number = parsed["results"][0]["itineraries"][0]["outbound"]["flights"]["flight_number"]
+		print company + number
+
+	else:	
+		print("not direct flight")
 
 if __name__ == '__main__':
 	main()
