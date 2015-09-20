@@ -13,12 +13,14 @@ def codes(city):
 	response = requests.get(url)
 	parsed = json.loads(response.text)	
 	n = 0
+	result = ""
 	try:
 		while parsed[n]:
-			print parsed[n]["value"]
+			result += parsed[n]["value"] + parsed[n]["label"]
 			n += 1
 	except IndexError:
 		pass
-
+	return result
+	
 if __name__ == "__main__":
 	main()
