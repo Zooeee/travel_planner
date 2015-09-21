@@ -24,7 +24,7 @@ def convert_codes(city):
 
 def match(origin, destination, date):
 	url = "https://api.sandbox.amadeus.com/v1.2/flights/low-fare-search?apikey=mbZfPQ5trh2G97whOJeTxGwB5MiHkkoV&origin="
-	search = url + origin + "&destination=" + destination +"&departure_date=" + date + "&travel_class=ECONOMY" + "&non-stop=true&max_price=10000"
+	search = url + origin + "&destination=" + destination +"&departure_date=" + date + "&include_airlines=AC&non-stop=true&max_price=10000"
 	page = requests.get(search)
 	parsed = json.loads(page.text)
 	tol_counter = 0
@@ -38,13 +38,23 @@ def match(origin, destination, date):
 
 	result = ""
 	#print parsed["results"][0]["itineraries"][0]["outbound"]["flights"]
-	if len(parsed["results"][0]["itineraries"][0]["outbound"]["flights"]) == 1:
-		company = parsed["results"][0]["itineraries"][0]["outbound"]["flights"]["operating_airline"]
-		number = parsed["results"][0]["itineraries"][0]["outbound"]["flights"]["flight_number"]
-		print company + number
+	try:
+		while parsed["results"][tol_counter]:
+			try:
+				while parsed["results"][tol_counter]["itineraries"][itin_counter]:
+					if len(parsed["results"][tol_counter]["itineraries"][itin_counter]["outbound"]["flights"]) == 1:
+						#company = parsed["results"][tol_counter]["itineraries"][itin_counter]["outbound"]["flights"]["operating_airline"]
+						number = parsed["results"][tol_counter]["itineraries"][itin_counter]["outbound"]["flights"][0]
+						itin_counter += 1
+						print number
 
-	else:	
-		print("not direct flight")
+					else:	
+						print("not a direct flight")
+						itin_counter += 1
+			except IndexError:
+				tol_counter += 1
+	except IndexError:
+		sys.exit(0)
 
 if __name__ == '__main__':
 	main()
